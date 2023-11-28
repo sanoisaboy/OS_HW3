@@ -113,7 +113,7 @@ int allocate_pid(void)
 
 void *threadFunc(void *arg)
 {
-	int sleep_time = (rand() % 2) + 1;
+	int sleep_time = (rand() % 10) + 1;
 	int PID = allocate_pid();
 	printf("Thread ID: %lu\npid=%d,this thread will sleep %d seconds\nRelease Pid %d\n", pthread_self(), PID, sleep_time, PID);
 	// printf("pid=%d,this thread will sleep %d seconds\n", PID, sleep_time);
