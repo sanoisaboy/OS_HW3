@@ -68,7 +68,7 @@ void release_pid(int pid)
 	}
 	else
 	{
-		printf("This Pid is not allocated\n");
+		// printf("This Pid is not allocated\n");
 	}
 
 	// list_bitmap();
@@ -115,8 +115,8 @@ void *threadFunc(void *arg)
 {
 	int sleep_time = (rand() % 2) + 1;
 	int PID = allocate_pid();
-	// printf("Thread ID: %lu\npid=%d,this thread will sleep %d seconds\nRelease Pid %d\n", pthread_self(), PID, sleep_time, (int)arg);
-	printf("pid=%d,this thread will sleep %d seconds\n", PID, sleep_time);
+	printf("Thread ID: %lu\npid=%d,this thread will sleep %d seconds\nRelease Pid %d\n", pthread_self(), PID, sleep_time, PID);
+	// printf("pid=%d,this thread will sleep %d seconds\n", PID, sleep_time);
 
 	// printf("Release Pid %d\n", PID);
 	sleep(sleep_time);
