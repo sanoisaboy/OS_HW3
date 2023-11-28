@@ -7,7 +7,8 @@
 unsigned int bitmap[4];
 pthread_t threads[100];
 int thread_count = 0;
-
+int PID_number = 0;
+int oneMap[110];
 void list_bitmap(void)
 {
 
@@ -19,6 +20,21 @@ void list_bitmap(void)
 	printf("------------------------------------------\n");
 
 	return;
+}
+
+void Isracecondition()
+{
+	// oneMap[PID]++;
+
+	for (int i = 0; i < 110; i++)
+	{
+		if (oneMap[i] > 1)
+			printf("race condition:%d\n", i);
+	}
+	for (int i = 0; i < 110; i++)
+	{
+		oneMap[i] = 0;
+	}
 }
 
 int allocate_map(void)
@@ -58,45 +74,6 @@ void release_pid(int pid)
 	// list_bitmap();
 }
 
-void *threadFunc(void *arg)
-{
-	int sleep_time = (rand() % 2) + 1;
-	printf("Thread ID: %lu\npid=%d,this thread will sleep %d seconds\nRelease Pid %d\n", pthread_self(), (int)arg, sleep_time, (int)arg);
-	// printf("pid=%d,this thread will sleep %d seconds\n", (int)arg, sleep_time);
-
-	// printf("Release Pid %d\n", (int)arg);
-	// sleep(sleep_time);
-	release_pid((int)arg);
-
-	pthread_exit(NULL);
-}
-
-void create_thread(int PID)
-{
-
-	int rc;
-	void *reBuf;
-	rc = pthread_create(&threads[thread_count], NULL, threadFunc, (void *)PID);
-
-	if (rc)
-	{
-		printf("error:%d\n", rc);
-		exit(-1);
-	}
-
-	// rc = pthread_join(thread, &reBuf);
-
-	if (rc)
-	{
-		printf("rrror:%d\n", rc);
-		exit(-1);
-	}
-
-	// printf("return value:%s\n", (char *)reBuf);
-	thread_count++;
-	return;
-}
-
 int allocate_pid(void)
 {
 
@@ -106,7 +83,7 @@ int allocate_pid(void)
 		return -1;
 	}
 
-	int PID_number = 0;
+	PID_number = 0;
 	int add_set = 1;
 	for (int i = 0; i < 4; i++)
 	{
@@ -128,10 +105,52 @@ int allocate_pid(void)
 
 	// printf("Successful to allocate PID. The PID of new process : %d\n", PID_number);
 
-	create_thread(PID_number);
+	return PID_number;
 	// list_bitmap();
 
-	return 0;
+	// return 0;
+}
+
+void *threadFunc(void *arg)
+{
+	int sleep_time = (rand() % 2) + 1;
+	int PID = allocate_pid();
+	// printf("Thread ID: %lu\npid=%d,this thread will sleep %d seconds\nRelease Pid %d\n", pthread_self(), PID, sleep_time, (int)arg);
+	printf("pid=%d,this thread will sleep %d seconds\n", PID, sleep_time);
+
+	// printf("Release Pid %d\n", PID);
+	sleep(sleep_time);
+	oneMap[PID]++;
+	release_pid(PID);
+
+	pthread_exit(NULL);
+}
+
+void create_thread()
+{
+
+	int rc;
+	void *reBuf;
+	// int PID = allocate_pid();
+	rc = pthread_create(&threads[thread_count], NULL, threadFunc, NULL);
+
+	if (rc)
+	{
+		printf("error:%d\n", rc);
+		exit(-1);
+	}
+
+	// rc = pthread_join(thread, &reBuf);
+
+	if (rc)
+	{
+		printf("rrror:%d\n", rc);
+		exit(-1);
+	}
+
+	// printf("return value:%s\n", (char *)reBuf);
+	thread_count++;
+	return;
 }
 
 int main(int argc, char *argv[])
@@ -153,14 +172,15 @@ int main(int argc, char *argv[])
 		{
 			for (int i = 0; i < 100; i++)
 			{
-
-				allocate_pid();
+				create_thread();
+				// allocate_pid();
 			}
 			for (int i = 0; i < thread_count; i++)
 			{
 				pthread_join(threads[i], NULL);
 			}
 			thread_count = 0;
+			Isracecondition();
 		}
 		else if (control_mode == 2)
 		{
