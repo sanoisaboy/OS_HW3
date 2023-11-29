@@ -35,6 +35,10 @@ void Isracecondition()
 	{
 		oneMap[i] = 0;
 	}
+	bitmap[0] = 0;
+	bitmap[1] = 0;
+	bitmap[2] = 0;
+	bitmap[3] = 0;
 }
 
 int allocate_map(void)
